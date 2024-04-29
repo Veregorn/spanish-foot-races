@@ -1,14 +1,21 @@
 {
   "name": "spanish-foot-races",
-  "version": "1.0.0",
-  "description": "This is a NodeJS + Express + MongoDB App to have a repository of the main Asphalt, Trail and OCR Races in Spain.",
-  "main": "index.js",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/www",
+    "devstart": "nodemon ./bin/www",
+    "serverstart": "DEBUG=spanish-foot-races:* npm run devstart"
   },
-  "author": "Veregorn",
-  "license": "ISC",
   "dependencies": {
-    "express": "^4.19.2"
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
   }
 }
