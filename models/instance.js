@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const modality = require('./modality');
 
 const Schema = mongoose.Schema;
 

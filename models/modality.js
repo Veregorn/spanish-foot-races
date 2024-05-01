@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
-const race = require('./race');
 
 const Schema = mongoose.Schema;
 
 const ModalitySchema = new Schema({
     race: { type: Schema.Types.ObjectId, ref: 'Race', required: true },
+    start_location: { type: Schema.Types.ObjectId, ref: 'Location', required: true },
+    end_location: { type: Schema.Types.ObjectId, ref: 'Location', required: true },
     distance: { type: Number, required: true },
     elevation: { type: Number, required: true },
     track: { type: String, required: true, max: 10000 },
