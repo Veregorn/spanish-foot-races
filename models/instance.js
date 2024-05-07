@@ -5,7 +5,6 @@ const Schema = mongoose.Schema;
 const InstanceSchema = new Schema({
     modality: { type: Schema.Types.ObjectId, ref: 'Modality', required: true },
     date: { type: Date, required: true },
-    time: { type: String, required: true, max: 100 },
     price: { type: Number, required: true },
 });
 

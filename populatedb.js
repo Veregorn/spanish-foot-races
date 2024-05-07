@@ -43,7 +43,7 @@ async function main() {
 // We pass the index to the ...Create functions so that, for example,
 // categories[0] will always be the Road Running category, regardless of the order
 // in which the elements of promise.all's argument complete.
-async function categoryCreate(index, name) {
+async function categoryCreate(index, name, description) {
     const categorydetail = { name: name };
     if (description != false) categorydetail.description = description;
 
@@ -292,11 +292,11 @@ async function createModalities() {
 async function createInstances() {
     console.log("Adding instances");
     await Promise.all([
-        instanceCreate(0, modalities[0], "2022-12-01", 60),
-        instanceCreate(1, modalities[1], "2022-12-01", 60),
-        instanceCreate(2, modalities[2], "2022-12-01", 60),
-        instanceCreate(3, modalities[3], "2022-12-01", 30),
-        instanceCreate(4, modalities[4], "2022-12-01", 30),
-        instanceCreate(5, modalities[5], "2022-12-01", 30),
+        instanceCreate(0, modalities[0], "2024-12-01T08:00:00Z", 60),
+        instanceCreate(1, modalities[1], "2024-08-23T07:30:00Z", 60),
+        instanceCreate(2, modalities[2], "2025-03-10T09:00:00Z", 60),
+        instanceCreate(3, modalities[3], "2024-11-03T10:00:00Z", 30),
+        instanceCreate(4, modalities[4], "2025-04-07T10:00:00Z", 30),
+        instanceCreate(5, modalities[5], "2024-09-10T08:00:00Z", 30),
     ]);
 }
