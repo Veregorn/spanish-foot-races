@@ -1,6 +1,11 @@
 const Instance = require('../models/instance');
 const asyncHandler = require('express-async-handler');
 
+// Display the home page.
+exports.index = function(req, res) {
+    res.render('index', { title: 'Home Page' });
+};
+
 // Display list of all Instances.
 exports.instance_list = asyncHandler(async function(req, res, next) {
     const instances = await Instance.find();
