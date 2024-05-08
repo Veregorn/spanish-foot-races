@@ -2,9 +2,13 @@ const Location = require('../models/location');
 const asyncHandler = require('express-async-handler');
 
 // Display list of all Locations.
-exports.location_list = asyncHandler(async function(req, res, next) {
-    const locations = await Location.find();
-    res.render('location_list', { title: 'Location List', locations });
+exports.location_list = asyncHandler(async (req, res, next) => {
+    const locations = await Location.find().sort({ city: 1 }).exec();
+    res.render('location_list', {
+        title: 'Location List',
+        location_list: locations,
+        layout: 'layout',
+    });
 });
 
 // Display detail page for a specific Location.

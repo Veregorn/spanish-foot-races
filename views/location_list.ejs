@@ -1,0 +1,14 @@
+<div class="content">
+    <h2><%= title %></h2>
+    <% if (location_list.length > 0) { %>
+        <ul class="locations">
+            <% location_list.forEach(function(location) { %>
+                <li>
+                    <a href="<%= location.url %>"><%= location.city %></a>
+                </li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>There are no locations.</p>
+    <% } %>
+</div>

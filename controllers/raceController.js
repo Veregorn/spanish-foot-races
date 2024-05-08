@@ -2,7 +2,7 @@ const Race = require('../models/race');
 const asyncHandler = require('express-async-handler');
 
 // Display list of all races.
-exports.race_list = asyncHandler(async function(req, res, next) {
+exports.race_list = asyncHandler(async (req, res, next) => {
     const races = await Race.find();
     res.render('race_list', { title: 'Race list', races });
 });

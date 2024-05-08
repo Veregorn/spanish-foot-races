@@ -20,7 +20,6 @@ const modalities = [];
 const instances = [];
 
 const mongoose = require("mongoose");
-const race = require("./models/race");
 mongoose.set("strictQuery", false);
 
 const mongoDB = userArgs[0];
@@ -31,6 +30,8 @@ async function main() {
     console.log("Debug: About to connect");
     await mongoose.connect(mongoDB);
     console.log("Debug: Should be connected?");
+    await clearDatabase();
+    console.log("Debug: Database cleared");
     await createCategories();
     await createLocations();
     await createRaces();
@@ -38,6 +39,17 @@ async function main() {
     await createInstances();
     console.log("Debug: Closing mongoose");
     mongoose.connection.close();
+}
+
+// This function clears the database of all documents
+async function clearDatabase() {
+    await Promise.all([
+        Category.deleteMany({}),
+        Location.deleteMany({}),
+        Race.deleteMany({}),
+        Modality.deleteMany({}),
+        Instance.deleteMany({}),
+    ]);
 }
 
 // We pass the index to the ...Create functions so that, for example,
