@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
-</html>
+<div class="content">
+  <h2>Dynamic content</h2>
+  <p>The Database has the following record counts:</p>
+  <ul>
+      <li><strong>Categories:</strong> <%= category_count %></li>
+      <li><strong>Instances:</strong> <%= instance_count %></li>
+      <li><strong>Locations:</strong> <%= location_count %></li>
+      <li><strong>Modalities:</strong> <%= modality_count %></li>
+      <li><strong>Races:</strong> <%= race_count %></li>
+  </ul>
+</div>

@@ -1,10 +1,38 @@
+const Category = require('../models/category');
 const Instance = require('../models/instance');
+const Modality = require('../models/modality');
+const Location = require('../models/location');
+const Race = require('../models/race');
+
 const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
 
 // Display the home page.
-exports.index = function(req, res) {
-    res.render('index', { title: 'Home Page' });
-};
+exports.index = asyncHandler(async (req, res) => {
+    // Get the count of each model.
+    const [
+        categoryCount,
+        instanceCount,
+        modalityCount,
+        locationCount,
+        raceCount,
+    ] = await Promise.all([
+        Category.countDocuments({}).exec(),
+        Instance.countDocuments({}).exec(),
+        Modality.countDocuments({}).exec(),
+        Location.countDocuments({}).exec(),
+        Race.countDocuments({}).exec(),
+    ]);
+
+    res.render('index', {
+        category_count: categoryCount,
+        instance_count: instanceCount,
+        modality_count: modalityCount,
+        location_count: locationCount,
+        race_count: raceCount,
+        layout: 'layout',
+    });
+});
 
 // Display list of all Instances.
 exports.instance_list = asyncHandler(async function(req, res, next) {
