@@ -1,4 +1,5 @@
 const Category = require('../models/category');
+const Race = require('../models/race');
 const asyncHandler = require('express-async-handler');
 
 // Display list of all Category.
@@ -12,9 +13,25 @@ exports.category_list = asyncHandler(async (req, res, next) => {
 });
 
 // Display detail page for a specific Category.
-exports.category_detail = asyncHandler(async function(req, res, next) {
-    const category = await Category.findById(req.params.id);
-    res.render('category_detail', { title: 'Category Detail', category });
+exports.category_detail = asyncHandler(async (req, res, next) => {
+    // Get details for the requested category and all the races in the category (in parallel).
+    const [category, racesInCategory] = await Promise.all([
+        Category.findById(req.params.id).exec(),
+        Race.find({ category: req.params.id }).exec(),
+    ]);
+
+    if (category == null) {
+        const err = new Error('Category not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('category_detail', {
+        title: 'Category Detail',
+        category: category,
+        category_races: racesInCategory,
+        layout: 'layout',
+    });
 });
 
 // Display Category create form on GET.
