@@ -1,0 +1,24 @@
+<div class="content">
+    <h2><%= title %></h2>
+    <p><strong>City: </strong><%= location.city %></p>
+    <p><strong>Community: </strong><%= location.community %></p>
+    <hr>
+    <div class="modalities">
+        <h3>Races</h3>
+        <% if (location_modalities.length > 0) { %>
+            <ul class="modalities">
+                <% location_modalities.forEach(function(modality) { %>
+                    <li>
+                        <a href="<%= modality.url %>"><%= modality.race.name %>: <%= modality.distance %></a>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>There are no races in this location.</p>
+        <% } %>
+    </div>
+    <hr>
+    <p><a href="<%= location.url %>/delete">Delete location</a></p>
+    <hr>
+    <p><a href="<%= location.url %>/update">Update location</a></p>
+</div>

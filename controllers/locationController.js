@@ -1,4 +1,5 @@
 const Location = require('../models/location');
+const Modality = require('../models/modality');
 const asyncHandler = require('express-async-handler');
 
 // Display list of all Locations.
@@ -12,9 +13,27 @@ exports.location_list = asyncHandler(async (req, res, next) => {
 });
 
 // Display detail page for a specific Location.
-exports.location_detail = asyncHandler(async function(req, res, next) {
-    const location = await Location.findById(req.params.id);
-    res.render('location_detail', { title: 'Location Detail', location });
+exports.location_detail = asyncHandler(async (req, res, next) => {
+    // Get details for the requested location and all the modalities that starts or end in that location.
+    const [location, modalitiesInLocation] = await Promise.all([
+        Location.findById(req.params.id).exec(),
+        Modality.find({ $or: [{ start_location: req.params.id }, { end_location: req.params.id }] })
+            .populate('race')
+            .exec(),
+    ]);
+
+    if (location == null) {
+        const err = new Error('Location not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('location_detail', {
+        title: 'Location Detail',
+        location: location,
+        location_modalities: modalitiesInLocation,
+        layout: 'layout',
+    });
 });
 
 // Display Location create form on GET.
