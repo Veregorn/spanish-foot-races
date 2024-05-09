@@ -3,8 +3,16 @@ const asyncHandler = require('express-async-handler');
 
 // Display list of all races.
 exports.race_list = asyncHandler(async (req, res, next) => {
-    const races = await Race.find();
-    res.render('race_list', { title: 'Race list', races });
+    const races = await Race.find({}, 'name category')
+        .sort({ name: 1})
+        .populate('category')
+        .exec();
+
+    res.render('race_list', {
+        title: 'Race list',
+        race_list: races,
+        layout: 'layout'
+    });
 });
 
 // Display detail page for a specific Race.

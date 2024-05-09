@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { DateTime } = require('luxon');
 
 const Schema = mongoose.Schema;
 
@@ -13,6 +14,13 @@ InstanceSchema
     .virtual('url')
     .get(function() {
         return '/catalog/instance/' + this._id;
+    });
+
+// Virtual for formatted date
+InstanceSchema
+    .virtual('formatted_date')
+    .get(function() {
+        return DateTime.fromJSDate(this.date).toLocaleString(DateTime.DATE_MED);
     });
 
 // Export model

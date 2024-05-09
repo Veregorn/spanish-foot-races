@@ -1,0 +1,12 @@
+<div class="content">
+    <h2><%= title %></h2>
+        <% if (race_list.length > 0) { %>
+            <% race_list.forEach(function(race) { %>
+                <ul>
+                    <li><a href="<%= race.url %>"><%= race.name %></a> (<%= race.category.name %>)</li>
+                </ul>
+            <% }); %>
+        <% } else { %>
+            <p>There are no races.</p>
+        <% } %>
+</div>

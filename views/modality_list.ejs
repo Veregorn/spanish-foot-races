@@ -1,0 +1,12 @@
+<div class="content">
+    <h2><%= title %></h2>
+        <% if (modality_list.length > 0) { %>
+            <% modality_list.forEach(function(modality) { %>
+                <ul>
+                    <li><a href="<%= modality.url %>"><%= modality.race.name %></a> (<%= modality.distance %> km)</li>
+                </ul>
+            <% }); %>
+        <% } else { %>
+            <p>There are no race modalities.</p>
+        <% } %>
+</div>

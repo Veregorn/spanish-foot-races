@@ -1,10 +1,20 @@
 const Modality = require('../models/modality');
 const asyncHandler = require('express-async-handler');
+const race = require('../models/race');
+const modality = require('../models/modality');
 
 // Display list of all Modalities.
-exports.modality_list = asyncHandler(async function(req, res, next) {
-    const modalities = await Modality.find();
-    res.render('modality_list', { title: 'Modality List', modalities });
+exports.modality_list = asyncHandler(async (req, res, next) => {
+    const modalities = await Modality.find({}, 'race distance')
+        .sort({ race: 1, distance: 1})
+        .populate('race')
+        .exec();
+
+    res.render('modality_list', {
+        title: 'Modality List',
+        modality_list: modalities,
+        layout: 'layout'
+    });
 });
 
 // Display detail page for a specific Modality.

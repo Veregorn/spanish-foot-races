@@ -1,0 +1,12 @@
+<div class="content">
+    <h2><%= title %></h2>
+        <% if (instance_list.length > 0) { %>
+            <% instance_list.forEach(function(instance) { %>
+                <ul>
+                    <li><a href="<%= instance.url %>"><%= instance.formatted_date %> - <%= instance.modality.race.name %>: <%= instance.modality.distance %></a></li>
+                </ul>
+            <% }); %>
+        <% } else { %>
+            <p>There are no race instances.</p>
+        <% } %>
+</div>

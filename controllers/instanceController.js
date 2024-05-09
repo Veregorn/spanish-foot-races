@@ -35,9 +35,23 @@ exports.index = asyncHandler(async (req, res) => {
 });
 
 // Display list of all Instances.
-exports.instance_list = asyncHandler(async function(req, res, next) {
-    const instances = await Instance.find();
-    res.render('instance_list', { title: 'Instance List', instances });
+exports.instance_list = asyncHandler(async (req, res, next) => {
+    const instances = await Instance.find({}, 'modality date')
+        .sort({ date: 1 })
+        .populate({
+            path: 'modality',
+            populate: {
+                path: 'race',
+                select: 'name',
+            },
+        })
+        .exec();
+
+    res.render('instance_list', {
+        title: 'Instance List',
+        instance_list: instances,
+        layout: 'layout',
+    });
 });
 
 // Display detail page for a specific Instance.
