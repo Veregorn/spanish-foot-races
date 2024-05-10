@@ -1,4 +1,5 @@
 const Race = require('../models/race');
+const Modality = require('../models/modality');
 const asyncHandler = require('express-async-handler');
 
 // Display list of all races.
@@ -16,9 +17,27 @@ exports.race_list = asyncHandler(async (req, res, next) => {
 });
 
 // Display detail page for a specific Race.
-exports.race_detail = asyncHandler(async function(req, res, next) {
-    const race = await Race.findById(req.params.id);
-    res.render('race_detail', { title: 'Race Detail', race });
+exports.race_detail = asyncHandler(async (req, res, next) => {
+    // Get details for the requested race, including the category and all the modalities that belongs to that race.
+    const [ race, modalitiesInRace ] = await Promise.all([
+        Race.findById(req.params.id)
+            .populate('category')
+            .exec(),
+        Modality.find({race: req.params.id}).exec()
+    ]);
+
+    if (race == null) {
+        const err = new Error('Race not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('race_detail', {
+        title: 'Race Detail',
+        race: race,
+        race_modalities: modalitiesInRace,
+        layout: 'layout'
+    });
 });
 
 // Display Race create form on GET.

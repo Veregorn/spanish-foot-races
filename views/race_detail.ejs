@@ -1,0 +1,26 @@
+<div class="content">
+    <h2><%= title %></h2>
+    <div class="logo-container"><img class="race-logo" src="<%= race.image_url %>" alt="race logo"/></div>
+    <p><strong>Name: </strong><%= race.name %></p>
+    <p><strong>Category: </strong><a href="<%= race.category.url %>"><%= race.category.name %></a></p>
+    <p><strong>Description: </strong><%= race.description %></p>
+    <hr>
+    <div class="modalities">
+        <h3>Modalities</h3>
+        <% if (race_modalities.length > 0) { %>
+            <ul class="modalities">
+                <% race_modalities.forEach(function(modality) { %>
+                    <li>
+                        <a href="<%= modality.url %>"><%= modality.distance %> km</a>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>There are no modalities for this race.</p>
+        <% } %>
+    </div>
+    <hr>
+    <p><a href="<%= race.url %>/delete">Delete race</a></p>
+    <hr>
+    <p><a href="<%= race.url %>/update">Update race</a></p>
+</div>

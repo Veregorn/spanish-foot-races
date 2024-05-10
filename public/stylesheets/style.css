@@ -43,3 +43,14 @@ li {
   list-style: none;
   margin: 10px 0;
 }
+
+.logo-container {
+  text-align: center;
+  padding: 50px;
+}
+
+.race-logo {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}

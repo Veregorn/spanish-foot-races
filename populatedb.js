@@ -1,4 +1,149 @@
 #! /usr/bin/env node
+const cloudinary = require("cloudinary").v2;
+require("dotenv").config();
+
+// Configuring cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
+});
+
+// Using the upload method to upload the logo images to cloudinary (function to be called in the main function)
+async function uploadImages() {
+    cloudinary.uploader.upload(
+        "./public/images/logo-maraton-valencia.png",
+        { public_id: "logo-maraton-valencia", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-maraton-sevilla.png",
+        { public_id: "logo-maraton-sevilla", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-maraton-castellon.png",
+        { public_id: "logo-maraton-castellon", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-os-21-do-camino.jpg",
+        { public_id: "logo-os-21-do-camino", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-behobia.jpeg",
+        { public_id: "logo-behobia", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-ultra-trail-sierra-nevada.jpg",
+        { public_id: "logo-ultra-trail-sierra-nevada", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/zegama-aizkorri-logo.jpg",
+        { public_id: "zegama-aizkorri-logo", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-gran-trail-picos-de-europa.png",
+        { public_id: "logo-gran-trail-picos-de-europa", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-gran-trail-aneto.png",
+        { public_id: "logo-gran-trail-aneto", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/transvulcania-logo.jpeg",
+        { public_id: "transvulcania-logo", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-templar-race-monzon.jpeg",
+        { public_id: "logo-templar-race-monzon", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-spartan.jpeg",
+        { public_id: "logo-spartan", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-farinato.webp",
+        { public_id: "logo-farinato", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-desafio-guerreros.png",
+        { public_id: "logo-desafio-guerreros", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+    
+    cloudinary.uploader.upload(
+        "./public/images/logo-survivor-race-alicante.jpg",
+        { public_id: "logo-survivor", tags: "logo" },
+        (err, image) => {
+            if (err) console.log(err);
+        }
+    );
+}
+
+// This function obtain the image urls from cloudinary and store them into an array
+async function getImages() {
+    const images = [];
+    await cloudinary.api.resources({ type: "upload", tags: "logo" }, (err, result) => {
+        if (err) console.log(err);
+        result.resources.forEach((image) => {
+            images.push(image);
+        });
+    });
+    //console.log(images);
+    return images;
+}
 
 console.log(
     'This script populates some test categories, locations, races, modalities and instances to your database. Specified database as argument - e.g.: node populatedb "mongodb+srv://cooluser:coolpassword@cluster0.lz91hw2.mongodb.net/local_library?retryWrites=true&w=majority"'
@@ -32,6 +177,8 @@ async function main() {
     console.log("Debug: Should be connected?");
     await clearDatabase();
     console.log("Debug: Database cleared");
+    await uploadImages();
+    console.log("Debug: Images uploaded");
     await createCategories();
     await createLocations();
     await createRaces();
@@ -152,97 +299,100 @@ async function createLocations() {
 }
 
 async function createRaces() {
+    // First we need to obtain the image urls from cloudinary
+    // const images = await getImages();
+
     console.log("Adding Races");
     await Promise.all([
-        raceCreate(0,
-        "Maratón de Valencia",
-        categories[0],
-        "The Valencia Marathon is held annually in the historic city of Valencia which, with its entirely flat circuit and perfect November temperature, averaging between 12-17 degrees, represents the ideal setting for hosting such a long-distance sporting challenge.",
-        "./public/images/logo-maraton-valencia.png"
+            raceCreate(0,
+            "Maratón de Valencia",
+            categories[0],
+            "The Valencia Marathon is held annually in the historic city of Valencia which, with its entirely flat circuit and perfect November temperature, averaging between 12-17 degrees, represents the ideal setting for hosting such a long-distance sporting challenge.",
+            await cloudinary.url("logo-maraton-valencia"),
         ),
         raceCreate(1,
-        "Maratón de Sevilla",
-        categories[0],
-        "The Zurich Maratón de Sevilla is the flattest marathon in Europe and the second fastest in Spain. It is the perfect place to run a personal best and achieve your goals.",
-        "./public/images/logo-maraton-sevilla.png"
+            "Maratón de Sevilla",
+            categories[0],
+            "The Zurich Maratón de Sevilla is the flattest marathon in Europe and the second fastest in Spain. It is the perfect place to run a personal best and achieve your goals.",
+            await cloudinary.url("logo-maraton-sevilla"),
         ),
         raceCreate(2,
-        "Maratón de Castellón",
-        categories[0],
-        "This WA Bronze Label race is an unavoidable appointment in the regional, national and international sports calendar, which will gather more than 5000 runners from around the world and will undoubtedly consolidate Castelló as a reference sports city.",
-        "./public/images/logo-maraton-castellon.png"
+            "Maratón de Castellón",
+            categories[0],
+            "This WA Bronze Label race is an unavoidable appointment in the regional, national and international sports calendar, which will gather more than 5000 runners from around the world and will undoubtedly consolidate Castelló as a reference sports city.",
+            await cloudinary.url("logo-maraton-castellon"),
         ),
         raceCreate(3,
-        "Os 21 Do Camiño",
-        categories[0],
-        "Os 21 do Camiño, the half marathon in A Coruña, a route through Galician nature that goes through El Camino de Santiago, awarded the World Heritage designation by the UNESCO. This route is completed by places of great spiritual importance, where you can beat your personal record or simply feel that your goal has been achieved with great success.",
-        "./public/images/logo-os-21-do-camino.jpg"
+            "Os 21 Do Camiño",
+            categories[0],
+            "Os 21 do Camiño, the half marathon in A Coruña, a route through Galician nature that goes through El Camino de Santiago, awarded the World Heritage designation by the UNESCO. This route is completed by places of great spiritual importance, where you can beat your personal record or simply feel that your goal has been achieved with great success.",
+            await cloudinary.url("logo-os-21-do-camino"),
         ),
         raceCreate(4,
-        "Behobia",
-        categories[0],
-        "This is a race with a very demanding route, with two major summits, Gaintxurizketa (km. 7) and Alto de Miracruz (km. 16), as well as a number of climbs and descents which should be taken into account when gauging your effort. There is a positive climb of 192 m. Our aim through the following information is to use plans and a description of each kilometre to give an understanding of the route to help you mentally prepare for the race.",
-        "./public/images/logo-behobia.jpeg"
+            "Behobia",
+            categories[0],
+            "This is a race with a very demanding route, with two major summits, Gaintxurizketa (km. 7) and Alto de Miracruz (km. 16), as well as a number of climbs and descents which should be taken into account when gauging your effort. There is a positive climb of 192 m. Our aim through the following information is to use plans and a description of each kilometre to give an understanding of the route to help you mentally prepare for the race.",
+            await cloudinary.url("logo-behobia"),
         ),
         raceCreate(5,
-        "Ultra Trail Sierra Nevada",
-        categories[1],
-        "An experience full of nature, culture and high summits. From the foot of the Alhambra to the Veleta Peak.",
-        "./public/images/logo-ultra-trail-sierra-nevada.jpg"
+            "Ultra Trail Sierra Nevada",
+            categories[1],
+            "An experience full of nature, culture and high summits. From the foot of the Alhambra to the Veleta Peak.",
+            await cloudinary.url("logo-ultra-trail-sierra-nevada"),
         ),
         raceCreate(6,
-        "Zegama Aizkorri",
-        categories[1],
-        "The Zegama-Aizkorri is an international skyrunning competition held for the first time in 2002. It runs every year in Spain from Zegama up to Aizkorri and finish in Zegama in May and consists of two races, a SkyMarathon and from 2015 also a Vertical Kilometer both valid for the Skyrunner World Series.",
-        "./public/images/zegama-aizkorri-logo.jpg"
+            "Zegama Aizkorri",
+            categories[1],
+            "The Zegama-Aizkorri is an international skyrunning competition held for the first time in 2002. It runs every year in Spain from Zegama up to Aizkorri and finish in Zegama in May and consists of two races, a SkyMarathon and from 2015 also a Vertical Kilometer both valid for the Skyrunner World Series.",
+            await cloudinary.url("zegama-aizkorri-logo"),
         ),
         raceCreate(7,
             "Gran Trail Picos de Europa",
             categories[1],
             "One of the most renowned races in northern Spain in the Western Massif of the Picos de Europa. It is organized by a team with extensive experience, with the support of the City Council of Onís. It is a spectacular route, for its beauty and its hardness. It starts in Benia de Onís and enters the Picos de Europa National Park, with 4 levels of difficulty.",
-            "./public/images/logo-gran-trail-picos-de-europa.png"
+            await cloudinary.url("logo-gran-trail-picos-de-europa"),
         ),
         raceCreate(8,
             "Gran Trail del Aneto",
             categories[1],
             "The Great Aneto-Posets Trail runs through all types of terrain, from tracks and trails to chambers and block chaos that surround the two highest peaks of the Pyrenees: the Aneto (3 404 m) and the Posets (3 375 m) . It is a spectacular race, in conditions of semi-self-sufficiency, that unites these two mountain ranges, forming an infinite route.",
-            "./public/images/logo-gran-trail-aneto.png",
+            await cloudinary.url("logo-gran-trail-aneto"),
         ),
         raceCreate(9,
             "Transvulcania",
             categories[1],
             "Transvulcania is a long distance race that is held annually on La Palma, one of the western Canary Islands. It is considered one of the hardest mountain-ultramarathons in the world and one of the most important in Spain.",
-            "./public/images/transvulcania-logo.jpeg",
+            await cloudinary.url("transvulcania-logo"),
         ),
         raceCreate(10,
             "Templar Race Monzón",
             categories[2],
             "The TEMPLAR of Monzón is undoubtedly the best obstacle race in Aragon and, according to the ranking by the digital magazine RUNEDIA, in collaboration with MUNDO DEPORTIVO, we are the BEST OBSTACLE RACE IN SPAIN for the last three editions of the race. It features a tough circuit with obstacles, passing through the monumental Castle of Monzón, and finishing with a brutal leg killer.",
-            "./public/images/logo-templar-race-monzon.jpeg",
+            await cloudinary.url("logo-templar-race-monzon"),
         ),
         raceCreate(11,
             "Spartan Race Madrid",
             categories[2],
             "The Spartan Race Madrid is a race that tests participants on rugged trails that require a mix of strength, agility, and speed. It's a tough and exciting OCR race.",
-            "./public/images/logo-spartan.jpeg",
+            await cloudinary.url("logo-spartan"),
         ),
         raceCreate(12,
             "Farinato Race Ponferrada",
             categories[2],
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nunc nec ultricies ultricies.",
-            "./public/images/logo-farinato.webp",
+            await cloudinary.url("logo-farinato"),
         ),
         raceCreate(13,
             "Desafío de Guerreros Getxo",
             categories[2],
             "Warrior Challenge is about experiencing the thrill of team sports and obstacle races like never before... Surrounded by nature, with water, mud, impressive obstacles, and lots of, lots of fun.",
-            "./public/images/logo-desafio-guerreros.png",
+            await cloudinary.url("logo-desafio-guerreros"),
         ),
         raceCreate(14,
             "Survivor Race Alicante",
             categories[2],
             "Survivor Race is a race with distances of 6km, 10km, and 15km full of obstacles that offer different levels of difficulty and fun.",
-            "./public/images/logo-survivor-race-alicante.png",
+            await cloudinary.url("logo-survivor"),
         ),
     ]);
 }
