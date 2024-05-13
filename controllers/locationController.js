@@ -1,6 +1,7 @@
 const Location = require('../models/location');
 const Modality = require('../models/modality');
 const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
 
 // Display list of all Locations.
 exports.location_list = asyncHandler(async (req, res, next) => {

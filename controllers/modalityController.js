@@ -1,6 +1,7 @@
 const Modality = require('../models/modality');
 const asyncHandler = require('express-async-handler');
 const Instance = require('../models/instance');
+const { body, validationResult } = require('express-validator');
 
 // Display list of all Modalities.
 exports.modality_list = asyncHandler(async (req, res, next) => {

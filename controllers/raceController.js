@@ -1,6 +1,7 @@
 const Race = require('../models/race');
 const Modality = require('../models/modality');
 const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
 
 // Display list of all races.
 exports.race_list = asyncHandler(async (req, res, next) => {
