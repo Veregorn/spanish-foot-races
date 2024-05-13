@@ -1,0 +1,11 @@
+<div class="content">
+    <h2><%= title %></h2>
+    <p><strong>Race Name: </strong><a href="<%= instance.modality.race.url %>"><%= instance.modality.race.name %></a></p>
+    <p><strong>Race Distance: </strong><a href="<%= instance.modality.url %>"><%= instance.modality.distance %> Km</a></p>
+    <p><strong>Fecha: </strong><%= instance.formatted_date %></p>
+    <p><strong>Price: </strong><%= instance.price %> euros</p>
+    <hr>
+    <p><a href="<%= instance.url %>/delete">Delete instance</a></p>
+    <hr>
+    <p><a href="<%= instance.url %>/update">Update instance</a></p>
+</div>

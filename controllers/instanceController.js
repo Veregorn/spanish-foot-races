@@ -55,9 +55,29 @@ exports.instance_list = asyncHandler(async (req, res, next) => {
 });
 
 // Display detail page for a specific Instance.
-exports.instance_detail = asyncHandler(async function(req, res, next) {
-    const instance = await Instance.findById(req.params.id);
-    res.render('instance_detail', { title: 'Instance Detail', instance });
+exports.instance_detail = asyncHandler(async (req, res, next) => {
+    // Get details for the requested instance
+    const instance = await Instance.findById(req.params.id)
+        .populate({
+            path: 'modality',
+            populate: {
+                path: 'race',
+                select: 'name',
+            },
+        })
+        .exec();
+
+    if (instance == null) {
+        const err = new Error('Instance not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('instance_detail', { 
+        title: 'Instance Detail',
+        instance: instance,
+        layout: 'layout',
+    });
 });
 
 // Display Instance create form on GET.
