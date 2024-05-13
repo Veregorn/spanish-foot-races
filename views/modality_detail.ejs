@@ -1,0 +1,26 @@
+<div class="content">
+    <h2><%= title %></h2>
+    <p><strong>Race: </strong><%= modality.race.name %></p>
+    <p><strong>Distance: </strong><%= modality.distance %> km</p>
+    <p><strong>Elevation: </strong><%= modality.elevation %> m</p>
+    <p><strong>Start Location: </strong><a href="<%= modality.start_location.url %>"><%= modality.start_location.city %></a></p>
+    <hr>
+    <div class="race_instances">
+        <h3>Race Instances</h3>
+        <% if (future_instances.length > 0) { %>
+            <ul class="instances">
+                <% future_instances.forEach(function(instance) { %>
+                    <li>
+                        <a href="<%= instance.url %>"><%= instance.formatted_date %> km</a>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>There are no instances for this race in this modality.</p>
+        <% } %>
+    </div>
+    <hr>
+    <p><a href="<%= modality.url %>/delete">Delete modality</a></p>
+    <hr>
+    <p><a href="<%= modality.url %>/update">Update modality</a></p>
+</div>

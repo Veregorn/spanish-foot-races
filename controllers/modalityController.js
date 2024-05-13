@@ -1,7 +1,6 @@
 const Modality = require('../models/modality');
 const asyncHandler = require('express-async-handler');
-const race = require('../models/race');
-const modality = require('../models/modality');
+const Instance = require('../models/instance');
 
 // Display list of all Modalities.
 exports.modality_list = asyncHandler(async (req, res, next) => {
@@ -18,9 +17,31 @@ exports.modality_list = asyncHandler(async (req, res, next) => {
 });
 
 // Display detail page for a specific Modality.
-exports.modality_detail = asyncHandler(async function(req, res, next) {
-    const modality = await Modality.findById(req.params.id);
-    res.render('modality_detail', { title: 'Modality Detail', modality });
+exports.modality_detail = asyncHandler(async (req, res, next) => {
+    // Get details for the requested modality, including the race name and location. Instances in future dates are also included.
+    const [ modality, futureInstances ] = await Promise.all([
+        Modality.findById(req.params.id)
+            .populate('race')
+            .populate('start_location')
+            .populate('end_location')
+            .exec(),
+        Instance.find({modality: req.params.id, date: {$gte: Date.now()}})
+            .sort({ date: 1 })
+            .exec()
+    ]);
+
+    if (modality == null) {
+        const err = new Error('Modality not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('modality_detail', {
+        title: 'Modality Detail',
+        modality: modality,
+        future_instances: futureInstances,
+        layout: 'layout'
+    });
 });
 
 // Display Modality create form on GET.
