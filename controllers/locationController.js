@@ -39,13 +39,65 @@ exports.location_detail = asyncHandler(async (req, res, next) => {
 
 // Display Location create form on GET.
 exports.location_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Location create GET');
+    res.render('location_form', {
+        title: 'Create Location',
+        location: null,
+        communities: Location.schema.path('community').enumValues,
+        errors: null,
+        layout: 'layout',
+    });
 };
 
 // Handle Location create on POST.
-exports.location_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Location create POST');
-};
+exports.location_create_post = [
+    // Validate and sanitize fields.
+    body('city', 'City name required')
+        .trim()
+        .isLength({ min: 1, max: 100 })
+        .escape(),
+    body('community')
+        .escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Location object with escaped and trimmed data.
+        const location = new Location({
+            city: req.body.city,
+            community: req.body.community,
+        });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values/error messages.
+            res.render('location_form', {
+                title: 'Create Location',
+                location: location,
+                communities: Location.schema.path('community').enumValues,
+                errors: errors.array(),
+                layout: 'layout',
+            });
+            return;
+        }
+
+        try {
+            // Check if Location with same name already exists.
+            const foundLocation = await Location.findOne({ city: req.body.city })
+                .collation({ locale: 'en', strength: 2 }) // Case-insensitive search
+                .exec();
+            if (foundLocation) {
+                res.redirect(foundLocation.url);
+            } else {
+                // Save the new Location.
+                await location.save();
+                res.redirect(location.url);
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }),
+];
 
 // Display Location delete form on GET.
 exports.location_delete_get = function(req, res) {

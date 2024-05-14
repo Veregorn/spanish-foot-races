@@ -1,0 +1,43 @@
+<div class="content">
+    <h2><%= title %></h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="city">City:</label>
+            <input
+                type="text"
+                id="city"
+                name="city"
+                class="form-control"
+                value="<%= location ? location.city : '' %>"
+                placeholder="Madrid, Barcelona, etc."
+                required>
+        </div>
+        <div class="form-group">
+            <label for="community">Community:</label>
+            <select
+                id="community"
+                name="community"
+                class="form-control"
+                required>
+                <option value="" disabled>--Please select a community--</option>
+                <% communities.forEach(function(community) { %>
+                    <option
+                        value="<%= community %>"
+                        <%= location && location.community === community ? 'selected' : '' %>>
+                        <%= community %>
+                    </option>
+                <% }) %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <% if (errors) { %>
+        <div class="alert alert-danger" role="alert">
+            <ul>
+                <% errors.forEach(function(error) { %>
+                    <li><%= error.msg %></li>
+                <% }) %>
+            </ul>
+        </div>
+    <% } %>
+</div>
