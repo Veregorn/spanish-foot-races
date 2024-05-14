@@ -1,7 +1,32 @@
 const Race = require('../models/race');
 const Modality = require('../models/modality');
+const Category = require('../models/category');
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
+const cloudinary = require("cloudinary").v2;
+require("dotenv").config();
+
+// Configuring cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
+});
+
+// Function to decode the image URL
+function decodeImageURL(imageURL) {
+    const entities = {
+        '&#x2F;': '/',
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#39;': "'"
+    };
+    return imageURL.replace(/&#x2F;|&amp;|&lt;|&gt;|&quot;|&#39;/g, function (match) {
+        return entities[match];
+    });
+};
 
 // Display list of all races.
 exports.race_list = asyncHandler(async (req, res, next) => {
@@ -42,14 +67,109 @@ exports.race_detail = asyncHandler(async (req, res, next) => {
 });
 
 // Display Race create form on GET.
-exports.race_create_get = function(req, res) {
-    res.send('NOT IMPLEMENT: Race create GET');
-};
+exports.race_create_get = asyncHandler(async (req, res) => {
+    // Get all the categories, which we can use for adding to our race
+    const categories = await Category.find().sort({ name: 1 }).exec();
+
+    res.render('race_form', {
+        title: 'Create race',
+        race: null,
+        categories: categories,
+        errors: null,
+        layout: 'layout',
+    });
+});
 
 // Display Race create form on POST.
-exports.race_create_post = function(req, res) {
-    res.send('NOT IMPLEMENT: Race create POST');
-};
+exports.race_create_post = [
+    // Convert the category to an array.
+    (req, res, next) => {
+        if (!(req.body.category instanceof Array)) {
+            if (typeof req.body.category === 'undefined') {
+                req.body.category = [];
+            } else {
+                req.body.category = new Array(req.body.category);
+            }
+        }
+        next();
+    },
+
+    // Validate and sanitize fields.
+    body('name', 'Race name required')
+        .trim()
+        .isLength({ min: 1, max: 200 })
+        .escape(),
+    body('category', 'Category required')
+        .trim()
+        .isLength({ min: 1, max: 100 })
+        .escape(),
+    body('description', 'Description (optional)')
+        .trim()
+        .isLength({ max: 1000 })
+        .escape(),
+    body('image_url', 'Image URL (optional)')
+        .trim()
+        .isLength({ max: 1000 })
+        .escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a race object with escaped and trimmed data.
+        const race = new Race({
+            name: req.body.name,
+            category: req.body.category,
+            description: req.body.description,
+            image_url: req.body.image_url,
+        });
+
+        console.log(race.image_url);
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values/error messages.
+
+            // Get all categories for form.
+            const categories = Category.find().sort({ name: 1 }).exec();
+            
+            res.render('race_form', {
+                title: 'Create Race',
+                race: race,
+                categories: categories,
+                errors: errors.array(),
+                layout: 'layout',
+            });
+            return;
+        }
+
+        try {
+            // Check if Race with same name already exists.
+            const existingRace = await Race.findOne({ name: req.body.name })
+                .collation({ locale: 'en', strength: 2 }) // Case-insensitive search
+                .exec();
+            if (existingRace) {
+                res.redirect(existingRace.url);
+            } else {
+                // Before saving we need to upload the image to the cloud storage and get the URL.
+                if (req.body.image_url) {
+                    // First we need to decode the image URL.
+                    req.body.image_url = decodeImageURL(req.body.image_url);
+                    await cloudinary.uploader.upload(req.body.image_url, {tags: "logo"}, (err, result) => {
+                        if (err) console.log(err);
+                    });
+                };
+
+                race.image_url = await cloudinary.url(req.body.image_url);
+                // Save the new Race.
+                await race.save();
+                res.redirect(race.url);
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }),
+];
 
 // Display Race delete form on GET.
 exports.race_delete_get = function(req, res) {

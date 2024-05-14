@@ -1,0 +1,63 @@
+<div class="content">
+    <h2><%= title %></h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="title">Name:</label>
+            <input
+                type="text"
+                id="name"
+                name="name"
+                class="form-control"
+                value="<%= race ? race.name : '' %>"
+                placeholder="Name of the race"
+                required>
+        </div>
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select
+                id="category"
+                name="category"
+                class="form-control"
+                required>
+                <option value="" disabled>--Please select a category--</option>
+                <% categories.forEach(function(category) { %>
+                    <option
+                        value="<%= category._id %>"
+                        <%= race && race.category._id.toString() === category._id.toString() ? 'selected' : '' %>>
+                        <%= category.name %>
+                    </option>
+                <% }) %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea
+                id="description"
+                name="description"
+                class="form-control"
+                placeholder="Description"
+                required><%= race ? race.description : '' %></textarea>
+        </div>
+        <div class="form-group">
+            <label for="image_url">Image URL:</label>
+            <input
+                type="text"
+                id="image_url"
+                name="image_url"
+                class="form-control"
+                value="<%- race ? race.image_url : '' %>"
+                placeholder="http://www.example.com/image.jpg"
+                required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <% if (errors) { %>
+        <div class="alert alert-danger" role="alert">
+            <ul>
+                <% errors.forEach(function(error) { %>
+                    <li><%= error.msg %></li>
+                <% }) %>
+            </ul>
+        </div>
+    <% } %>
+</div>
