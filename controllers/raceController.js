@@ -82,18 +82,6 @@ exports.race_create_get = asyncHandler(async (req, res) => {
 
 // Display Race create form on POST.
 exports.race_create_post = [
-    // Convert the category to an array.
-    (req, res, next) => {
-        if (!(req.body.category instanceof Array)) {
-            if (typeof req.body.category === 'undefined') {
-                req.body.category = [];
-            } else {
-                req.body.category = new Array(req.body.category);
-            }
-        }
-        next();
-    },
-
     // Validate and sanitize fields.
     body('name', 'Race name required')
         .trim()
@@ -124,8 +112,6 @@ exports.race_create_post = [
             description: req.body.description,
             image_url: req.body.image_url,
         });
-
-        console.log(race.image_url);
 
         if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values/error messages.

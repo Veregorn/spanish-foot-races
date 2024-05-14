@@ -1,9 +1,10 @@
 <div class="content">
     <h2><%= title %></h2>
-    <p><strong>Race: </strong><%= modality.race.name %></p>
+    <p><strong>Race: </strong><a href="<%= modality.race.url %>"><%= modality.race.name %></a></p>
     <p><strong>Distance: </strong><%= modality.distance %> km</p>
     <p><strong>Elevation: </strong><%= modality.elevation %> m</p>
     <p><strong>Start Location: </strong><a href="<%= modality.start_location.url %>"><%= modality.start_location.city %></a></p>
+    <p><strong>End Location: </strong><a href="<%= modality.end_location.url %>"><%= modality.end_location.city %></a></p>
     <hr>
     <div class="race_instances">
         <h3>Race Instances</h3>
