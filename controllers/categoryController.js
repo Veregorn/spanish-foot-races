@@ -99,14 +99,49 @@ exports.category_create_post = [
 ];
 
 // Display Category delete form on GET.
-exports.category_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Category delete GET');
-};
+exports.category_delete_get = asyncHandler(async (req, res) => {
+    // Get details of the requested category and all the races in the category.
+    const [category, racesInCategory] = await Promise.all([
+        Category.findById(req.params.id).exec(),
+        Race.find({ category: req.params.id }).exec(),
+    ]);
+
+    if (category == null) {
+        // No results.
+        res.redirect('/catalog/categories');
+    }
+
+    res.render('category_delete', {
+        title: 'Delete Category',
+        category: category,
+        category_races: racesInCategory,
+        layout: 'layout',
+    });
+});
 
 // Handle Category delete on POST.
-exports.category_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Category delete POST');
-};
+exports.category_delete_post = asyncHandler(async (req, res) => {
+    // Get details of the requested category and all the races in the category.
+    const [category, racesInCategory] = await Promise.all([
+        Category.findById(req.body.categoryid).exec(),
+        Race.find({ category: req.body.categoryid }).exec(),
+    ]);
+
+    if (racesInCategory.length > 0) {
+        // Category has races. Render the form again with sanitized values/error messages.
+        res.render('category_delete', {
+            title: 'Delete Category',
+            category: category,
+            category_races: racesInCategory,
+            layout: 'layout',
+        });
+        return;
+    } else {
+        // Category has no races. Delete the category and redirect to the list of categories.
+        await Category.findByIdAndDelete(req.body.categoryid).exec();
+        res.redirect('/catalog/categories');
+    }
+});
 
 // Display Category update form on GET.
 exports.category_update_get = function(req, res) {
