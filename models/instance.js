@@ -23,5 +23,12 @@ InstanceSchema
         return DateTime.fromJSDate(this.date).toLocaleString(DateTime.DATE_MED);
     });
 
+// Virtual for formatted date (YYYY-MM-DD)
+InstanceSchema
+    .virtual('formatted_date_yyyy_mm_dd')
+    .get(function() {
+        return DateTime.fromJSDate(this.date).toISODate();
+    });
+
 // Export model
 module.exports = mongoose.model('Instance', InstanceSchema);

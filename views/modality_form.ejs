@@ -12,7 +12,7 @@
                 <% races.forEach(function(race) { %>
                     <option
                         value="<%= race._id %>"
-                        <%= race && race._id.toString() === race._id.toString() ? 'selected' : '' %>>
+                        <%= modality && modality.race._id.toString() === race._id.toString() ? 'selected' : '' %>>
                         <%= race.name %>
                     </option>
                 <% }) %>
@@ -51,7 +51,7 @@
                 <% locations.forEach(function(location) { %>
                     <option
                         value="<%= location._id %>"
-                        <%= location && location._id.toString() === location._id.toString() ? 'selected' : '' %>>
+                        <%= modality && modality.start_location._id.toString() === location._id.toString() ? 'selected' : '' %>>
                         <%= location.city %>
                     </option>
                 <% }) %>
@@ -68,7 +68,7 @@
                 <% locations.forEach(function(location) { %>
                     <option
                         value="<%= location._id %>"
-                        <%= location && location._id.toString() === location._id.toString() ? 'selected' : '' %>>
+                        <%= modality && modality.end_location._id.toString() === location._id.toString() ? 'selected' : '' %>>
                         <%= location.city %>
                     </option>
                 <% }) %>
