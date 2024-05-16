@@ -3,7 +3,7 @@
         <% if (instance_list.length > 0) { %>
             <% instance_list.forEach(function(instance) { %>
                 <ul>
-                    <li><a href="<%= instance.url %>"><%= instance.formatted_date %> - <%= instance.modality.race.name %>: <%= instance.modality.distance %></a></li>
+                    <li><a href="<%= instance.url %>"><%= instance.formatted_date %> - <%= instance.modality.race.name %>: <%= instance.modality.distance %> Km</a></li>
                 </ul>
             <% }); %>
         <% } else { %>

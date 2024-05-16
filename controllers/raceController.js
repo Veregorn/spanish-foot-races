@@ -159,6 +159,7 @@ exports.race_create_post = [
 
 // Display Race delete form on GET.
 exports.race_delete_get = asyncHandler(async (req, res) => {
+    console.log('Deleting the race with id (GET): ' + req.params.id);
     // Get details of the requested race and all the modalities that belongs to that race.
     const [race, modalitiesInRace] = await Promise.all([
         Race.findById(req.params.id).exec(),
@@ -180,11 +181,18 @@ exports.race_delete_get = asyncHandler(async (req, res) => {
 
 // Display Race delete form on POST.
 exports.race_delete_post = asyncHandler(async (req, res) => {
+    console.log('Deleting the race with id (POST): ' + req.body.raceid);
     // Get details of the requested race and all the modalities that belongs to that race.
     const [race, modalitiesInRace] = await Promise.all([
         Race.findById(req.body.raceid).exec(),
         Modality.find({ race: req.body.raceid }).exec(),
     ]);
+
+    if (race != null) {
+        console.log('There is one race with the id: ' + req.body.raceid);
+    } else {
+        console.log('There are no races with the id: ' + req.body.raceid);
+    }
 
     if (modalitiesInRace.length > 0) {
         // Race has modalities. Render the form again with sanitized values/error messages.

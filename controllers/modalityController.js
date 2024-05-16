@@ -186,7 +186,7 @@ exports.modality_delete_post = asyncHandler(async (req, res) => {
         return;
     } else {
         // Modality has no instances. Delete object and redirect to the list of modalities.
-        await Modality.findByIdAndRemove(req.body.modalityid);
+        await Modality.findByIdAndDelete(req.body.modalityid).exec();
         res.redirect('/catalog/modalities');
     }
 });

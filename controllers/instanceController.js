@@ -156,14 +156,38 @@ exports.instance_create_post = [
 ];
     
 // Display Instance delete form on GET.
-exports.instance_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Instance delete GET');
-};
+exports.instance_delete_get = asyncHandler(async (req, res) => {
+    // Get the instance and its modality.
+    const instance = await Instance.findById(req.params.id).exec();
+    const modality = await Modality.findById(instance.modality).populate('race').exec();
+
+    if (instance == null) {
+        // No results.
+        res.redirect('/catalog/instances');
+    }
+
+    res.render('instance_delete', {
+        title: 'Delete Instance',
+        instance: instance,
+        modality: modality,
+        layout: 'layout',
+    });
+});
 
 // Handle Instance delete on POST.
-exports.instance_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Instance delete POST');
-};
+exports.instance_delete_post = asyncHandler(async (req, res) => {
+    // Get the instance.
+    const instance = await Instance.findById(req.body.instanceid).exec();
+
+    if (instance == null) {
+        // No results.
+        res.redirect('/catalog/instances');
+    }
+
+    // Delete the instance and redirect to the list of instances.
+    await Instance.findByIdAndDelete(req.body.instanceid).exec();
+    res.redirect('/catalog/instances');
+});
 
 // Display Instance update form on GET.
 exports.instance_update_get = function(req, res) {
