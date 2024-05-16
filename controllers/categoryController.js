@@ -144,11 +144,61 @@ exports.category_delete_post = asyncHandler(async (req, res) => {
 });
 
 // Display Category update form on GET.
-exports.category_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Category update GET');
-};
+exports.category_update_get = asyncHandler(async (req, res, next) => {
+    // Get the category.
+    const category = await Category.findById(req.params.id).exec();
+
+    if (category == null) {
+        // No results.
+        res.redirect('/catalog/categories');
+    }
+
+    res.render('category_form', {
+        title: 'Update Category',
+        category: category,
+        errors: null,
+        layout: 'layout',
+    });
+});
 
 // Handle Category update on POST.
-exports.category_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Category update POST');
-};
+exports.category_update_post = [
+    // Validate and sanitize fields.
+    body('name', 'Category name required')
+        .trim()
+        .isLength({ min: 1, max: 100 })
+        .escape(),
+    body('description', 'Description (optional)')
+        .trim()
+        .isLength({ max: 1000 })
+        .escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Category object with escaped and trimmed data.
+        const category = new Category({
+            name: req.body.name,
+            description: req.body.description,
+            _id: req.params.id, // This is required, or a new ID will be assigned!
+
+        });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values/error messages.
+            res.render('category_form', {
+                title: 'Update Category',
+                category: category,
+                errors: errors.array(),
+                layout: 'layout',
+            });
+            return;
+        } else {
+            // Data from form is valid. Update the Category.
+            await Category.findByIdAndUpdate(req.params.id, category, {});
+            res.redirect(category.url);
+        }
+    }),
+];
