@@ -1,9 +1,13 @@
 <div class="content">
     <h2><%= title %></h2>
-    <div class="logo-container"><img class="race-logo" src="<%= race.image_url %>" alt="race logo"/></div>
+    <% if (race.image_url != '') { %>
+        <div class="logo-container"><img class="race-logo" src="<%= race.image_url %>" alt="race logo"/></div>
+    <% } %>
     <p><strong>Name: </strong><%= race.name %></p>
     <p><strong>Category: </strong><a href="<%= race.category.url %>"><%= race.category.name %></a></p>
-    <p><strong>Description: </strong><%= race.description %></p>
+    <% if (race.description != '') { %>
+        <p><strong>Description: </strong><%= race.description %></p>
+    <% } %>
     <hr>
     <div class="modalities">
         <h3>Modalities</h3>

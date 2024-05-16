@@ -110,7 +110,7 @@ exports.race_create_post = [
             name: req.body.name,
             category: req.body.category,
             description: req.body.description,
-            image_url: req.body.image_url,
+            image_url: req.body.image_url || '',
         });
 
         if (!errors.isEmpty()) {
@@ -138,15 +138,15 @@ exports.race_create_post = [
                 res.redirect(existingRace.url);
             } else {
                 // Before saving we need to upload the image to the cloud storage and get the URL.
-                if (req.body.image_url) {
+                if (req.body.image_url !== '') {
                     // First we need to decode the image URL.
                     req.body.image_url = decodeImageURL(req.body.image_url);
                     await cloudinary.uploader.upload(req.body.image_url, {tags: "logo"}, (err, result) => {
                         if (err) console.log(err);
                     });
-                };
 
-                race.image_url = await cloudinary.url(req.body.image_url);
+                    race.image_url = await cloudinary.url(req.body.image_url);
+                }
                 // Save the new Race.
                 await race.save();
                 res.redirect(race.url);
@@ -211,11 +211,84 @@ exports.race_delete_post = asyncHandler(async (req, res) => {
 });
 
 // Display Race update form on GET.
-exports.race_update_get = function(req, res) {
-    res.send('NOT IMPLEMENT: Race update GET');
-};
+exports.race_update_get = asyncHandler(async (req, res, next) => {
+    // Get the race.
+    const race = await Race.findById(req.params.id).exec();
+    const categories = await Category.find().sort({ name: 1 }).exec();
+
+    if (race == null) {
+        // No results.
+        const err = new Error('Race not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('race_form', {
+        title: 'Update Race',
+        race: race,
+        categories: categories,
+        errors: null,
+        layout: 'layout',
+    });
+});
 
 // Display Race update form on POST.
-exports.race_update_post = function(req, res) {
-    res.send('NOT IMPLEMENT: Race update POST');
-};
+exports.race_update_post = [
+    // Validate and sanitize fields.
+    body('name', 'Race name required')
+        .trim()
+        .isLength({ min: 1, max: 200 })
+        .escape(),
+    body('category', 'Category required')
+        .trim()
+        .isLength({ min: 1, max: 100 })
+        .escape(),
+    body('description', 'Description (optional)')
+        .trim()
+        .isLength({ max: 1000 })
+        .escape(),
+    body('image_url', 'Image URL (optional)')
+        .trim()
+        .isLength({ max: 1000 })
+        .escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Race object with escaped and trimmed data.
+        const race = new Race({
+            name: req.body.name,
+            category: req.body.category,
+            description: req.body.description,
+            image_url: req.body.image_url,
+            _id: req.params.id, // This is required, or a new ID will be assigned!
+        });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values/error messages.
+            res.render('race_form', {
+                title: 'Update Race',
+                race: race,
+                errors: errors.array(),
+                layout: 'layout',
+            });
+            return;
+        } else {
+            // Before saving we need to upload the image to the cloud storage and get the URL.
+            if (req.body.image_url !== '') {
+                // First we need to decode the image URL.
+                req.body.image_url = decodeImageURL(req.body.image_url);
+                await cloudinary.uploader.upload(req.body.image_url, {tags: "logo"}, (err, result) => {
+                    if (err) console.log(err);
+                });
+
+                race.image_url = await cloudinary.url(req.body.image_url);
+            }
+            // Data from form is valid. Update the Race.
+            await Race.findByIdAndUpdate(req.params.id, race, {});
+            res.redirect(race.url);
+        }
+    }),
+];

@@ -35,8 +35,7 @@
                 id="description"
                 name="description"
                 class="form-control"
-                placeholder="Description"
-                required><%= race ? race.description : '' %></textarea>
+                placeholder="Description (optional)"><%= race ? race.description : '' %></textarea>
         </div>
         <div class="form-group">
             <label for="image_url">Image URL:</label>
@@ -46,8 +45,7 @@
                 name="image_url"
                 class="form-control"
                 value="<%- race ? race.image_url : '' %>"
-                placeholder="http://www.example.com/image.jpg"
-                required>
+                placeholder="http://www.example.com/image.jpg (optional)">
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
