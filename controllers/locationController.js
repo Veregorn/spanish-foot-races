@@ -100,14 +100,49 @@ exports.location_create_post = [
 ];
 
 // Display Location delete form on GET.
-exports.location_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Location delete GET');
-};
+exports.location_delete_get = asyncHandler(async (req, res) => {
+    // Get the location and all the modalities that starts or end in that location.
+    const [location, modalitiesInLocation] = await Promise.all([
+        Location.findById(req.params.id).exec(),
+        Modality.find({ $or: [{ start_location: req.params.id }, { end_location: req.params.id }] }).populate('race').exec(),
+    ]);
+
+    if (location == null) {
+        // No results.
+        res.redirect('/catalog/locations');
+    }
+
+    res.render('location_delete', {
+        title: 'Delete Location',
+        location: location,
+        location_modalities: modalitiesInLocation,
+        layout: 'layout',
+    });
+});
 
 // Handle Location delete on POST.
-exports.location_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Location delete POST');
-};
+exports.location_delete_post = asyncHandler(async (req, res) => {
+    // Get the location and all the modalities that starts or end in that location.
+    const [location, modalitiesInLocation] = await Promise.all([
+        Location.findById(req.body.locationid).exec(),
+        Modality.find({ $or: [{ start_location: req.body.locationid }, { end_location: req.body.locationid }] }).exec(),
+    ]);
+
+    if (modalitiesInLocation.length > 0) {
+        // Location has modalities. Render in same way as for GET route.
+        res.render('location_delete', {
+            title: 'Delete Location',
+            location: location,
+            location_modalities: modalitiesInLocation,
+            layout: 'layout',
+        });
+        return;
+    } else {
+        // Location has no modalities. Delete object and redirect to the list of locations.
+        await Location.findByIdAndDelete(req.body.locationid).exec();
+        res.redirect('/catalog/locations');
+    }
+});
 
 // Display Location update form on GET.
 exports.location_update_get = function(req, res) {

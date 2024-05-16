@@ -1,0 +1,25 @@
+<div class="content">
+    <h2><%= title %>: <%= location.city %></h2>
+
+    <% if (location_modalities.length > 0) { %>
+        <p><strong>Delete the following modality races before attempting to delete this location.</strong></p>
+        <div class="modalities">
+            <h3>Modalities</h3>
+            <ul>
+                <% location_modalities.forEach(function(modality) { %>
+                    <li>
+                        <a href="<%= modality.url %>"><%= modality.race.name %> - <%= modality.distance %> Km</a>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+    <% } else { %>
+        <p><strong>Do you really want to delete this location?</strong></p>
+        <form method="post">
+            <div class="form-group">
+                <input id="locationid" class="form-control" type="hidden" name="locationid" value="<%= location._id %>">
+            </div>
+            <button type="submit" class="btn btn-primary">Delete</button>
+        </form>
+    <% } %>
+</div>
