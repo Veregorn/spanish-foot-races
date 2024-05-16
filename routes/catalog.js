@@ -101,13 +101,13 @@ router.post('/race/create', raceController.race_create_post);
 router.get('/race/:id/delete', raceController.race_delete_get);
 
 // POST request to delete Race.
-router.post('race/:id/delete', raceController.race_delete_post);
+router.post('/race/:id/delete', raceController.race_delete_post);
 
 // GET request to update Race.
-router.get('race/:id/update', raceController.race_update_get);
+router.get('/race/:id/update', raceController.race_update_get);
 
 // POST request to update Race.
-router.post('race/:id/update', raceController.race_update_post);
+router.post('/race/:id/update', raceController.race_update_post);
 
 // GET request for one Race.
 router.get('/race/:id', raceController.race_detail);
