@@ -158,14 +158,49 @@ exports.race_create_post = [
 ];
 
 // Display Race delete form on GET.
-exports.race_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENT: Race delete GET');
-};
+exports.race_delete_get = asyncHandler(async (req, res) => {
+    // Get details of the requested race and all the modalities that belongs to that race.
+    const [race, modalitiesInRace] = await Promise.all([
+        Race.findById(req.params.id).exec(),
+        Modality.find({ race: req.params.id }).exec(),
+    ]);
+
+    if (race == null) {
+        // No results.
+        res.redirect('/catalog/races');
+    }
+
+    res.render('race_delete', {
+        title: 'Delete Race',
+        race: race,
+        race_modalities: modalitiesInRace,
+        layout: 'layout',
+    });
+});
 
 // Display Race delete form on POST.
-exports.race_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENT: Race delete POST');
-};
+exports.race_delete_post = asyncHandler(async (req, res) => {
+    // Get details of the requested race and all the modalities that belongs to that race.
+    const [race, modalitiesInRace] = await Promise.all([
+        Race.findById(req.body.raceid).exec(),
+        Modality.find({ race: req.body.raceid }).exec(),
+    ]);
+
+    if (modalitiesInRace.length > 0) {
+        // Race has modalities. Render the form again with sanitized values/error messages.
+        res.render('race_delete', {
+            title: 'Delete Race',
+            race: race,
+            race_modalities: modalitiesInRace,
+            layout: 'layout',
+        });
+        return;
+    } else {
+        // Race has no modalities. Delete the race and redirect to the list of races.
+        await Race.findByIdAndDelete(req.body.raceid).exec();
+        res.redirect('/catalog/races');
+    }
+});
 
 // Display Race update form on GET.
 exports.race_update_get = function(req, res) {
