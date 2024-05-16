@@ -145,11 +145,61 @@ exports.location_delete_post = asyncHandler(async (req, res) => {
 });
 
 // Display Location update form on GET.
-exports.location_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Location update GET');
-};
+exports.location_update_get = asyncHandler(async (req, res, next) => {
+    // Get the location.
+    const location = await Location.findById(req.params.id).exec();
+
+    if (location == null) {
+        const err = new Error('Location not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('location_form', {
+        title: 'Update Location',
+        location: location,
+        communities: Location.schema.path('community').enumValues,
+        errors: null,
+        layout: 'layout',
+    });
+});
 
 // Handle Location update on POST.
-exports.location_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Location update POST');
-};
+exports.location_update_post = [
+    // Validate and sanitize fields.
+    body('city', 'City name required')
+        .trim()
+        .isLength({ min: 1, max: 100 })
+        .escape(),
+    body('community')
+        .escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Location object with escaped and trimmed data.
+        const location = new Location({
+            city: req.body.city,
+            community: req.body.community,
+            _id: req.params.id,
+        });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values/error messages.
+            res.render('location_form', {
+                title: 'Update Location',
+                location: location,
+                communities: Location.schema.path('community').enumValues,
+                errors: errors.array(),
+                layout: 'layout',
+            });
+            return;
+        } else {
+            // Data from form is valid. Update the record.
+            await Location.findByIdAndUpdate(req.params.id, location, {});
+            res.redirect(location.url);
+        }
+    }),
+];

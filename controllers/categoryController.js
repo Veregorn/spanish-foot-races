@@ -150,7 +150,9 @@ exports.category_update_get = asyncHandler(async (req, res, next) => {
 
     if (category == null) {
         // No results.
-        res.redirect('/catalog/categories');
+        const err = new Error('Category not found');
+        err.status = 404;
+        return next(err);
     }
 
     res.render('category_form', {
