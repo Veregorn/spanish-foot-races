@@ -147,14 +147,49 @@ exports.modality_create_post = [
 ];
 
 // Display Modality delete form on GET.
-exports.modality_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Modality delete GET');
-};
+exports.modality_delete_get = asyncHandler(async (req, res) => {
+    // Get the modality and all the instances that use it.
+    const [ modality, instances ] = await Promise.all([
+        Modality.findById(req.params.id).populate('race').exec(),
+        Instance.find({ modality: req.params.id }).exec(),
+    ]);
+
+    if (modality == null) {
+        // No results.
+        res.redirect('/catalog/modalities');
+    }
+
+    res.render('modality_delete', {
+        title: 'Delete Modality',
+        modality: modality,
+        instances: instances,
+        layout: 'layout',
+    });
+});
 
 // Handle Modality delete on POST.
-exports.modality_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Modality delete POST');
-};
+exports.modality_delete_post = asyncHandler(async (req, res) => {
+    // Get the modality and all the instances that use it.
+    const [ modality, instances ] = await Promise.all([
+        Modality.findById(req.body.modalityid).exec(),
+        Instance.find({ modality: req.body.modalityid }).exec(),
+    ]);
+
+    if (instances.length > 0) {
+        // Modality has instances. Render in the same way as for GET route.
+        res.render('modality_delete', {
+            title: 'Delete Modality',
+            modality: modality,
+            instances: instances,
+            layout: 'layout',
+        });
+        return;
+    } else {
+        // Modality has no instances. Delete object and redirect to the list of modalities.
+        await Modality.findByIdAndRemove(req.body.modalityid);
+        res.redirect('/catalog/modalities');
+    }
+});
 
 // Display Modality update form on GET.
 exports.modality_update_get = function(req, res) {
