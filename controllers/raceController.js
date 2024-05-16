@@ -268,9 +268,14 @@ exports.race_update_post = [
 
         if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values/error messages.
+
+            // Get all categories for form.
+            const categories = Category.find().sort({ name: 1 }).exec();
+
             res.render('race_form', {
                 title: 'Update Race',
                 race: race,
+                categories: categories,
                 errors: errors.array(),
                 layout: 'layout',
             });

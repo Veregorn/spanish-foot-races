@@ -192,11 +192,95 @@ exports.modality_delete_post = asyncHandler(async (req, res) => {
 });
 
 // Display Modality update form on GET.
-exports.modality_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Modality update GET');
-};
+exports.modality_update_get = asyncHandler(async (req, res, next) => {
+    // Get the modality and all the races and locations available to choose from.
+    const [ modality, races, locations ] = await Promise.all([
+        Modality.findById(req.params.id).exec(),
+        Race.find().sort({ name: 1 }).exec(),
+        Location.find().sort({ city: 1 }).exec(),
+    ]);
+
+    if (modality == null) {
+        // No results.
+        const err = new Error('Modality not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('modality_form', {
+        title: 'Update Modality',
+        modality: modality,
+        races: races,
+        locations: locations,
+        errors: null,
+        layout: 'layout',
+    });
+});
 
 // Handle Modality update on POST.
-exports.modality_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Modality update POST');
-};
+exports.modality_update_post = [
+    // Validate and sanitize fields
+    body('race', 'Race required')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('distance', 'Distance required')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('start_location', 'Start location required')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('end_location', 'End location required')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('elevation', 'Elevation required')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('track', 'Track code required')
+        .trim()
+        .isLength({ min: 1, max: 10000 })
+        .escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Modality object with escaped and trimmed data.
+        const modality = new Modality({
+            race: req.body.race,
+            distance: req.body.distance,
+            start_location: req.body.start_location,
+            end_location: req.body.end_location,
+            elevation: req.body.elevation,
+            track: req.body.track,
+            _id: req.params.id, // This is required, or a new ID will be assigned!
+        });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values/error messages.
+
+            // Get all the races and locations available to choose from.
+            const [races, locations] = await Promise.all([
+                Race.find().sort({ name: 1 }).exec(),
+                Location.find().sort({ city: 1 }).exec(),
+            ]);
+
+            res.render('modality_form', {
+                title: 'Update Modality',
+                modality: modality,
+                errors: errors.array(),
+                layout: 'layout',
+            });
+            return;
+        } else {
+            // Data from form is valid. Update the record.
+            await Modality.findByIdAndUpdate(req.params.id, modality, {});
+            res.redirect(modality.url);
+        }
+    }),
+];
