@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+// Require middleware modules.
+const authMiddleware = require('../middleware/auth');
+
 // Require controller modules.
 const instanceController = require('../controllers/instanceController');
 const locationController = require('../controllers/locationController');
@@ -23,13 +26,14 @@ router.post('/instance/create', instanceController.instance_create_post);
 router.get('/instance/:id/delete', instanceController.instance_delete_get);
 
 // POST request to delete Instance.
-router.post('/instance/:id/delete', instanceController.instance_delete_post);
+// We use authMiddleware to protect this route. Only authenticated users can delete instances. Same for the update routes.
+router.post('/instance/:id/delete', authMiddleware, instanceController.instance_delete_post);
 
 // GET request to update Instance.
 router.get('/instance/:id/update', instanceController.instance_update_get);
 
 // POST request to update Instance.
-router.post('/instance/:id/update', instanceController.instance_update_post);
+router.post('/instance/:id/update', authMiddleware, instanceController.instance_update_post);
 
 // GET request for one Instance.
 router.get('/instance/:id', instanceController.instance_detail);
@@ -49,13 +53,13 @@ router.post('/location/create', locationController.location_create_post);
 router.get('/location/:id/delete', locationController.location_delete_get);
 
 // POST request to delete Location.
-router.post('/location/:id/delete', locationController.location_delete_post);
+router.post('/location/:id/delete', authMiddleware, locationController.location_delete_post);
 
 // GET request to update Location.
 router.get('/location/:id/update', locationController.location_update_get);
 
 // POST request to update Location.
-router.post('/location/:id/update', locationController.location_update_post);
+router.post('/location/:id/update', authMiddleware, locationController.location_update_post);
 
 // GET request for one Location.
 router.get('/location/:id', locationController.location_detail);
@@ -75,13 +79,13 @@ router.post('/category/create', categoryController.category_create_post);
 router.get('/category/:id/delete', categoryController.category_delete_get);
 
 // POST request to delete Category.
-router.post('/category/:id/delete', categoryController.category_delete_post);
+router.post('/category/:id/delete', authMiddleware, categoryController.category_delete_post);
 
 // GET request to update Category.
 router.get('/category/:id/update', categoryController.category_update_get);
 
 // POST request to update Category.
-router.post('/category/:id/update', categoryController.category_update_post);
+router.post('/category/:id/update', authMiddleware, categoryController.category_update_post);
 
 // GET request for one Category.
 router.get('/category/:id', categoryController.category_detail);
@@ -101,13 +105,13 @@ router.post('/race/create', raceController.race_create_post);
 router.get('/race/:id/delete', raceController.race_delete_get);
 
 // POST request to delete Race.
-router.post('/race/:id/delete', raceController.race_delete_post);
+router.post('/race/:id/delete', authMiddleware, raceController.race_delete_post);
 
 // GET request to update Race.
 router.get('/race/:id/update', raceController.race_update_get);
 
 // POST request to update Race.
-router.post('/race/:id/update', raceController.race_update_post);
+router.post('/race/:id/update', authMiddleware, raceController.race_update_post);
 
 // GET request for one Race.
 router.get('/race/:id', raceController.race_detail);
@@ -127,13 +131,13 @@ router.post('/modality/create', modalityController.modality_create_post);
 router.get('/modality/:id/delete', modalityController.modality_delete_get);
 
 // POST request to delete Modality.
-router.post('/modality/:id/delete', modalityController.modality_delete_post);
+router.post('/modality/:id/delete', authMiddleware, modalityController.modality_delete_post);
 
 // GET request to update Modality.
 router.get('/modality/:id/update', modalityController.modality_update_get);
 
 // POST request to update Modality.
-router.post('/modality/:id/update', modalityController.modality_update_post);
+router.post('/modality/:id/update', authMiddleware, modalityController.modality_update_post);
 
 // GET request for one Modality.
 router.get('/modality/:id', modalityController.modality_detail);

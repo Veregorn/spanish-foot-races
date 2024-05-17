@@ -5,17 +5,25 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const expressLayouts = require('express-ejs-layouts');
-
+const session = require('express-session');
 
 
 // Setup routes
 const indexRouter = require('./routes/index');
 const catalogRouter = require('./routes/catalog');
+const passwordRoutes = require('./routes/password');
 
 const app = express();
 
 // Load environment variables
 require('dotenv').config();
+
+// Setup session
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true
+}));
 
 // Setup Mongoose connection
 mongoose.set('strictQuery', false);
@@ -43,6 +51,7 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
+app.use('/', passwordRoutes);
 app.use('/catalog', catalogRouter);
 
 // catch 404 and forward to error handler

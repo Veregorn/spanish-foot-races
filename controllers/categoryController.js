@@ -136,10 +136,19 @@ exports.category_delete_post = asyncHandler(async (req, res) => {
             layout: 'layout',
         });
         return;
-    } else {
-        // Category has no races. Delete the category and redirect to the list of categories.
-        await Category.findByIdAndDelete(req.body.categoryid).exec();
-        res.redirect('/catalog/categories');
+    } else { // Category has no races.
+        // Test for authenticated user
+        if (req.session.authenticated) {
+            // Retrieve data session
+            req.body = req.session.body || req.body;
+            req.session.body = null; // Reset data session
+
+            // Delete the category and redirect to the list of categories.
+            await Category.findByIdAndDelete(req.body.categoryid).exec();
+            res.redirect('/catalog/categories');
+        } else {
+            res.redirect(`/confirm-password?returnTo=${encodeURIComponent(req.originalUrl)}`);
+        }
     }
 });
 
@@ -165,6 +174,15 @@ exports.category_update_get = asyncHandler(async (req, res, next) => {
 
 // Handle Category update on POST.
 exports.category_update_post = [
+    // Middleware to move data from session to body
+    (req, res, next) => {
+        if (req.session.body) {
+            req.body = req.session.body;
+            req.session.body = null;
+        }
+        next();
+    },
+
     // Validate and sanitize fields.
     body('name', 'Category name required')
         .trim()
@@ -198,9 +216,14 @@ exports.category_update_post = [
             });
             return;
         } else {
-            // Data from form is valid. Update the Category.
-            await Category.findByIdAndUpdate(req.params.id, category, {});
-            res.redirect(category.url);
+            // Test for authenticated user
+            if (req.session.authenticated) {
+                // Data from form is valid. Update the Category.
+                await Category.findByIdAndUpdate(req.params.id, category, {});
+                res.redirect(category.url);
+            } else {
+                res.redirect(`/confirm-password?returnTo=${encodeURIComponent(req.originalUrl)}`);
+            }
         }
     }),
 ];
