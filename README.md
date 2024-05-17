@@ -3,3 +3,6 @@ This is a NodeJS + Express + MongoDB App to have a repository of the main Asphal
 
 ## Model
 ![Model](model.png)
+
+## Security
+Session auth is used to protect update and delete ops. Password is saved in a .env variable

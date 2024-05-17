@@ -185,9 +185,18 @@ exports.instance_delete_post = asyncHandler(async (req, res) => {
         res.redirect('/catalog/instances');
     }
 
-    // Delete the instance and redirect to the list of instances.
-    await Instance.findByIdAndDelete(req.body.instanceid).exec();
-    res.redirect('/catalog/instances');
+    // Auth user is not allowed to delete instances.
+    if (req.session.authenticated) {
+        // Retrieve data session
+        req.body = req.session.body || req.body;
+        req.session.body = null; // Reset data session
+
+        // Delete the instance and redirect to the list of instances.
+        await Instance.findByIdAndDelete(req.body.instanceid).exec();
+        res.redirect('/catalog/instances');
+    } else {
+        res.redirect(`/confirm-password?returnTo=${encodeURIComponent(req.originalUrl)}`);
+    }
 });
 
 // Display Instance update form on GET.
@@ -216,6 +225,15 @@ exports.instance_update_get = asyncHandler(async (req, res, next) => {
 
 // Handle Instance update on POST.
 exports.instance_update_post = [
+    // Middleware to move data from session to body
+    (req, res, next) => {
+        if (req.session.body) {
+            req.body = req.session.body;
+            req.session.body = null;
+        }
+        next();
+    },
+
     // Validate and sanitize fields.
     body('modality', 'Modality must be specified')
         .isLength({ min: 1 })
@@ -259,9 +277,14 @@ exports.instance_update_post = [
             });
             return;
         } else {
-            // Data from form is valid. Update the instance.
-            await Instance.findByIdAndUpdate(req.params.id, instance, {});
-            res.redirect(instance.url);
+            // Test for auth user
+            if (req.session.authenticated) {
+                // Data from form is valid. Update the instance.
+                await Instance.findByIdAndUpdate(req.params.id, instance, {});
+                res.redirect(instance.url);
+            } else {
+                res.redirect(`/confirm-password?returnTo=${encodeURIComponent(req.originalUrl)}`);
+            }
         }
     })
 ];
