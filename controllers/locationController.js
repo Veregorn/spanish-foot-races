@@ -138,9 +138,18 @@ exports.location_delete_post = asyncHandler(async (req, res) => {
         });
         return;
     } else {
-        // Location has no modalities. Delete object and redirect to the list of locations.
-        await Location.findByIdAndDelete(req.body.locationid).exec();
-        res.redirect('/catalog/locations');
+        // Test for auth user
+        if (req.session.authenticated) {
+            // Retrieve data session
+            req.body = req.session.body || req.body;
+            req.session.body = null; // Reset data session
+
+            // Location has no modalities. Delete object and redirect to the list of locations.
+            await Location.findByIdAndDelete(req.body.locationid).exec();
+            res.redirect('/catalog/locations');
+        } else {
+            res.redirect(`/confirm-password?returnTo=${encodeURIComponent(req.originalUrl)}`);
+        }
     }
 });
 
@@ -166,6 +175,15 @@ exports.location_update_get = asyncHandler(async (req, res, next) => {
 
 // Handle Location update on POST.
 exports.location_update_post = [
+    // Middleware to move data from session to body
+    (req, res, next) => {
+        if (req.session.body) {
+            req.body = req.session.body;
+            req.session.body = null;
+        }
+        next();
+    },
+
     // Validate and sanitize fields.
     body('city', 'City name required')
         .trim()
@@ -197,9 +215,14 @@ exports.location_update_post = [
             });
             return;
         } else {
-            // Data from form is valid. Update the record.
-            await Location.findByIdAndUpdate(req.params.id, location, {});
-            res.redirect(location.url);
+            // Test for authenticated user
+            if (req.session.authenticated) {
+                // Data from form is valid. Update the record.
+                await Location.findByIdAndUpdate(req.params.id, location, {});
+                res.redirect(location.url);
+            } else {
+                res.redirect(`/confirm-password?returnTo=${encodeURIComponent(req.originalUrl)}`);
+            }
         }
     }),
 ];
